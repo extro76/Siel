@@ -1,0 +1,13 @@
+[package]
+name = "siel-retrieval"
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+[dependencies]
+siel-core = { path = "../siel-core" }
+siel-db = { path = "../siel-db" }
+siel-vector = { path = "../siel-vector" }
+serde.workspace = true
+sha2.workspace = true
+

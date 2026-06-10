@@ -1,0 +1,15 @@
+target/
+**/*.rs.bk
+.env
+.env.*
+!.env.example
+.venv/
+__pycache__/
+*.pyc
+models/weights/
+*.gguf
+*.onnx
+*.db
+*.db-shm
+*.db-wal
+

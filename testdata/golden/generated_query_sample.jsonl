@@ -1,0 +1,2 @@
+{"id": "known_001", "kind": "known", "question": "Che cos'e SIEL?", "expected_item_id": "item_siel_definition"}
+{"id": "ood_001", "kind": "out_of_domain", "question": "Che tempo fara tra cento anni?", "expected_status": "unknown"}

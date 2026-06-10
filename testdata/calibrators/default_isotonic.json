@@ -1,0 +1,7 @@
+{
+  "method": "isotonic",
+  "version": 1,
+  "x_thresholds": [0.0, 0.62, 0.82, 1.0],
+  "y_probabilities": [0.0, 0.62, 0.82, 1.0]
+}
+

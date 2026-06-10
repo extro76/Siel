@@ -1,0 +1,13 @@
+{
+  "model_id": "qwen3-embedding-0.6b",
+  "model_version": "1.0.0",
+  "profile": "edge-pro",
+  "runtime": "external",
+  "dimensions": 1024,
+  "quantization": "manifest-specific",
+  "checksum_sha256": "fill-after-download",
+  "license": "verify-upstream-before-use",
+  "download_url": "https://huggingface.co/Qwen/Qwen3-Embedding-0.6B",
+  "notes": "Weights are not committed. Pin exact artifact, license, and checksum before enabling."
+}
+

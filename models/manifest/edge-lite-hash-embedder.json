@@ -1,0 +1,13 @@
+{
+  "model_id": "hash-embedder",
+  "model_version": "0.1.0",
+  "profile": "edge-lite-dev",
+  "runtime": "builtin",
+  "dimensions": 64,
+  "quantization": "none",
+  "checksum_sha256": "not-applicable",
+  "license": "project-internal",
+  "download_url": null,
+  "notes": "Deterministic bootstrap embedder for tests. Replace with ONNX INT8 before production."
+}
+

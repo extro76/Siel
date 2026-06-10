@@ -1,0 +1,13 @@
+[package]
+name = "siel-llm"
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+[dependencies]
+siel-core = { path = "../siel-core" }
+reqwest.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+uuid.workspace = true
+
