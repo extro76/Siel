@@ -1,12 +1,12 @@
 use std::{collections::HashMap, sync::Arc};
 
+use sha2::{Digest, Sha256};
 use siel_core::{
-    decide, ConfidenceProfile, SielError, Evidence, ModelRef, QueryRequest, QueryResponse,
-    QueryStatus, Result,
+    decide, ConfidenceProfile, Evidence, ModelRef, QueryRequest, QueryResponse, QueryStatus,
+    Result, SielError,
 };
 use siel_db::SielDb;
 use siel_vector::{VectorIndex, VectorSearchFilter};
-use sha2::{Digest, Sha256};
 
 pub trait Embedder: Send + Sync {
     fn model_ref(&self) -> ModelRef;
@@ -296,7 +296,13 @@ mod tests {
     fn deterministic_query_returns_support() {
         let db = Arc::new(SielDb::memory(b"master").unwrap());
         let item = db
-            .create_item("Che cos'è SIEL?", "SIEL è un motore di conoscenza.", "it", None, None)
+            .create_item(
+                "Che cos'è SIEL?",
+                "SIEL è un motore di conoscenza.",
+                "it",
+                None,
+                None,
+            )
             .unwrap();
         let service = RetrievalService::new(
             db,
@@ -322,4 +328,3 @@ mod tests {
         assert_eq!(response.support_ids[0], item);
     }
 }
-

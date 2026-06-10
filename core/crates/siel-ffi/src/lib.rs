@@ -13,4 +13,3 @@ pub fn offline_unknown_json(reason: &str) -> String {
     serde_json::to_string(&QueryResponse::unknown(reason))
         .unwrap_or_else(|_| "{\"status\":\"unknown\"}".to_string())
 }
-

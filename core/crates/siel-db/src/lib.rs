@@ -4,12 +4,12 @@ mod schema;
 use std::path::Path;
 
 pub use crypto::CryptoBox;
-use siel_core::{
-    new_id, ApproveResponse, SielError, Evidence, KnowledgeItem, KnowledgePayload,
-    KnowledgeStatus, Result, TeachProposalKind, TeachRequest, TeachResponse,
-};
 use rusqlite::{params, Connection, OptionalExtension};
 use sha2::{Digest, Sha256};
+use siel_core::{
+    new_id, ApproveResponse, Evidence, KnowledgeItem, KnowledgePayload, KnowledgeStatus, Result,
+    SielError, TeachProposalKind, TeachRequest, TeachResponse,
+};
 
 pub struct SielDb {
     path: String,
@@ -44,7 +44,8 @@ impl SielDb {
     }
 
     pub fn with_conn<T>(&self, f: impl FnOnce(&Connection) -> rusqlite::Result<T>) -> Result<T> {
-        let conn = Connection::open(&self.path).map_err(|err| SielError::Storage(err.to_string()))?;
+        let conn =
+            Connection::open(&self.path).map_err(|err| SielError::Storage(err.to_string()))?;
         conn.pragma_update(None, "foreign_keys", "ON")
             .map_err(|err| SielError::Storage(err.to_string()))?;
         f(&conn).map_err(|err| SielError::Storage(err.to_string()))
@@ -73,7 +74,9 @@ impl SielDb {
         let key_id = new_id("key");
         let item_key = self.crypto.generate_item_key();
         let wrapped_key = self.crypto.wrap_key(&item_key);
-        let encrypted = self.crypto.encrypt_payload(&item_key, question, answer, id.as_bytes())?;
+        let encrypted = self
+            .crypto
+            .encrypt_payload(&item_key, question, answer, id.as_bytes())?;
         let checksum = checksum(question, answer);
 
         self.with_conn(|conn| {
@@ -142,21 +145,23 @@ impl SielDb {
             Ok(row)
         })?
         .ok_or_else(|| SielError::NotFound(item_id.to_string()))
-        .and_then(|(wrapped_key, question_cipher, answer_cipher, nonce, aad)| {
-            let item_key = self.crypto.unwrap_key(&wrapped_key)?;
-            let (question, answer) = self.crypto.decrypt_payload(
-                &item_key,
-                &question_cipher,
-                &answer_cipher,
-                &nonce,
-                &aad,
-            )?;
-            Ok(KnowledgePayload {
-                item_id: item_id.to_string(),
-                question,
-                answer,
-            })
-        })
+        .and_then(
+            |(wrapped_key, question_cipher, answer_cipher, nonce, aad)| {
+                let item_key = self.crypto.unwrap_key(&wrapped_key)?;
+                let (question, answer) = self.crypto.decrypt_payload(
+                    &item_key,
+                    &question_cipher,
+                    &answer_cipher,
+                    &nonce,
+                    &aad,
+                )?;
+                Ok(KnowledgePayload {
+                    item_id: item_id.to_string(),
+                    question,
+                    answer,
+                })
+            },
+        )
     }
 
     pub fn get_item(&self, item_id: &str) -> Result<KnowledgeItem> {
@@ -352,7 +357,10 @@ impl SielDb {
                  WHERE id = ?1",
                 params![item_id],
             )?;
-            tx.execute("DELETE FROM knowledge_fts WHERE item_id = ?1", params![item_id])?;
+            tx.execute(
+                "DELETE FROM knowledge_fts WHERE item_id = ?1",
+                params![item_id],
+            )?;
             tx.execute("DELETE FROM embedding WHERE item_id = ?1", params![item_id])?;
             tx.execute(
                 "INSERT INTO audit_event(id, event_type, item_id, metadata_json)

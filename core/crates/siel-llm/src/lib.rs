@@ -1,10 +1,10 @@
 use std::collections::HashSet;
 
-use siel_core::{
-    validate_supported_response, SielError, Evidence, QueryResponse, QueryStatus, Result,
-};
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
+use siel_core::{
+    validate_supported_response, Evidence, QueryResponse, QueryStatus, Result, SielError,
+};
 use uuid::Uuid;
 
 #[derive(Debug, Clone)]
@@ -165,4 +165,3 @@ mod tests {
         assert_eq!(response.status, QueryStatus::Unknown);
     }
 }
-

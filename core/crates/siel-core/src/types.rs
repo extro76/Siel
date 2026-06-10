@@ -137,4 +137,3 @@ pub struct ApproveResponse {
 pub fn new_id(prefix: &str) -> String {
     format!("{prefix}_{}", Uuid::new_v4())
 }
-

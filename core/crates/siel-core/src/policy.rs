@@ -79,4 +79,3 @@ mod tests {
         assert_eq!(checked.status, QueryStatus::Unknown);
     }
 }
-

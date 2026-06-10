@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{SielError, Result};
+use crate::{Result, SielError};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "method", rename_all = "snake_case")]
@@ -84,4 +84,3 @@ impl Default for ConfidenceProfile {
         }
     }
 }
-

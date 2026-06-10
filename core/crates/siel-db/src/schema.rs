@@ -156,4 +156,3 @@ CREATE INDEX IF NOT EXISTS idx_embedding_model
 CREATE INDEX IF NOT EXISTS idx_audit_item
     ON audit_event(item_id, created_at);
 "#;
-

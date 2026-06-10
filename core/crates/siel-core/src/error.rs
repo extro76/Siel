@@ -27,4 +27,3 @@ impl From<serde_json::Error> for SielError {
         Self::Serialization(value.to_string())
     }
 }
-

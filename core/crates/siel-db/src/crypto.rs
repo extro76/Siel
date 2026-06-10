@@ -2,9 +2,9 @@ use chacha20poly1305::{
     aead::{Aead, KeyInit, OsRng},
     ChaCha20Poly1305, Key, Nonce,
 };
-use siel_core::{SielError, Result};
 use rand::RngCore;
 use sha2::{Digest, Sha256};
+use siel_core::{Result, SielError};
 
 pub struct EncryptedPayload {
     pub question_cipher: Vec<u8>,
@@ -38,7 +38,9 @@ impl CryptoBox {
 
     pub fn unwrap_key(&self, wrapped_key: &[u8]) -> Result<[u8; 32]> {
         if wrapped_key.len() != 32 {
-            return Err(SielError::Crypto("wrapped key is invalid or destroyed".to_string()));
+            return Err(SielError::Crypto(
+                "wrapped key is invalid or destroyed".to_string(),
+            ));
         }
         let mut wrapped = [0_u8; 32];
         wrapped.copy_from_slice(wrapped_key);

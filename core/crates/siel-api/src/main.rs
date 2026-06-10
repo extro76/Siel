@@ -7,13 +7,11 @@ use axum::{
     routing::{get, post},
     Json, Router,
 };
-use siel_core::{
-    ApproveRequest, ConfidenceProfile, SielError, QueryRequest, TeachRequest,
-};
+use serde::Serialize;
+use siel_core::{ApproveRequest, ConfidenceProfile, QueryRequest, SielError, TeachRequest};
 use siel_db::SielDb;
 use siel_retrieval::{HashEmbedder, RetrievalService};
 use siel_vector::{FakeVectorIndex, VectorIndex};
-use serde::Serialize;
 use tower_http::{cors::CorsLayer, trace::TraceLayer};
 
 type AppRetrieval = RetrievalService<FakeVectorIndex, HashEmbedder>;
@@ -29,7 +27,8 @@ struct AppState {
 async fn main() -> anyhow::Result<()> {
     tracing_subscriber::fmt()
         .with_env_filter(
-            std::env::var("RUST_LOG").unwrap_or_else(|_| "siel_api=info,tower_http=info".to_string()),
+            std::env::var("RUST_LOG")
+                .unwrap_or_else(|_| "siel_api=info,tower_http=info".to_string()),
         )
         .init();
 
@@ -129,7 +128,7 @@ async fn delete_item(
     Ok(StatusCode::NO_CONTENT)
 }
 
-async fn rollback(Path(_id): Path<String>) -> Result<Json<impl Serialize>, ApiError> {
+async fn rollback(Path(_id): Path<String>) -> Result<Json<serde_json::Value>, ApiError> {
     Err(ApiError(SielError::InvalidInput(
         "rollback endpoint is reserved; snapshot restore is not enabled until audit snapshots are populated".to_string(),
     )))

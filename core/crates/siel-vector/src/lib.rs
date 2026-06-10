@@ -3,9 +3,9 @@ use std::{
     sync::{Arc, RwLock},
 };
 
-use siel_core::{SielError, Result};
-use rusqlite::{params, Connection, OptionalExtension};
+use rusqlite::{params, Connection};
 use serde::{Deserialize, Serialize};
+use siel_core::{Result, SielError};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum VectorScoreKind {
@@ -42,7 +42,12 @@ pub trait VectorIndex: Send + Sync {
         vectors: &[(&str, &[f32])],
     ) -> Result<()>;
 
-    fn search(&self, query: &[f32], k: usize, filter: &VectorSearchFilter) -> Result<Vec<VectorHit>>;
+    fn search(
+        &self,
+        query: &[f32],
+        k: usize,
+        filter: &VectorSearchFilter,
+    ) -> Result<Vec<VectorHit>>;
     fn delete_id(&self, id: &str) -> Result<()>;
     fn delete_model_version(&self, model_id: &str, model_version: &str) -> Result<()>;
     fn list_stale(&self, model_id: &str, current_version: &str) -> Result<Vec<String>>;
@@ -88,7 +93,12 @@ impl VectorIndex for FakeVectorIndex {
         Ok(())
     }
 
-    fn search(&self, query: &[f32], k: usize, filter: &VectorSearchFilter) -> Result<Vec<VectorHit>> {
+    fn search(
+        &self,
+        query: &[f32],
+        k: usize,
+        filter: &VectorSearchFilter,
+    ) -> Result<Vec<VectorHit>> {
         let guard = self
             .vectors
             .read()
@@ -171,7 +181,8 @@ impl SqliteVecIndex {
     }
 
     fn with_conn<T>(&self, f: impl FnOnce(&Connection) -> rusqlite::Result<T>) -> Result<T> {
-        let conn = Connection::open(&self.path).map_err(|err| SielError::Storage(err.to_string()))?;
+        let conn =
+            Connection::open(&self.path).map_err(|err| SielError::Storage(err.to_string()))?;
         f(&conn).map_err(|err| SielError::Storage(err.to_string()))
     }
 }
@@ -212,7 +223,12 @@ impl VectorIndex for SqliteVecIndex {
         })
     }
 
-    fn search(&self, query: &[f32], k: usize, filter: &VectorSearchFilter) -> Result<Vec<VectorHit>> {
+    fn search(
+        &self,
+        query: &[f32],
+        k: usize,
+        filter: &VectorSearchFilter,
+    ) -> Result<Vec<VectorHit>> {
         self.with_conn(|conn| {
             let mut stmt = conn.prepare(
                 "SELECT id, dimensions, vector FROM vector_index
@@ -337,7 +353,9 @@ mod tests {
         index
             .upsert_batch("m", "1", 2, &[("a", &[1.0, 0.0]), ("b", &[0.0, 1.0])])
             .unwrap();
-        index.upsert_batch("m", "2", 2, &[("c", &[1.0, 0.0])]).unwrap();
+        index
+            .upsert_batch("m", "2", 2, &[("c", &[1.0, 0.0])])
+            .unwrap();
 
         let hits = index
             .search(
@@ -361,8 +379,9 @@ mod tests {
     #[test]
     fn detects_stale_vectors() {
         let index = FakeVectorIndex::default();
-        index.upsert_batch("m", "1", 2, &[("a", &[1.0, 0.0])]).unwrap();
+        index
+            .upsert_batch("m", "1", 2, &[("a", &[1.0, 0.0])])
+            .unwrap();
         assert_eq!(index.list_stale("m", "2").unwrap(), vec!["a".to_string()]);
     }
 }
-
