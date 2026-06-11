@@ -179,6 +179,10 @@ impl SielDb {
     }
 
     pub fn fts_search(&self, query: &str, limit: usize) -> Result<Vec<Evidence>> {
+        let Some(fts_query) = build_fts_query(query) else {
+            return Ok(Vec::new());
+        };
+
         self.with_conn(|conn| {
             let mut stmt = conn.prepare(
                 "SELECT f.item_id, f.question, f.answer, i.source_id, bm25(knowledge_fts) AS rank
@@ -190,7 +194,7 @@ impl SielDb {
                  ORDER BY rank
                  LIMIT ?2",
             )?;
-            let rows = stmt.query_map(params![query, limit as i64], |row| {
+            let rows = stmt.query_map(params![fts_query, limit as i64], |row| {
                 let rank: f64 = row.get(4)?;
                 Ok(Evidence {
                     item_id: row.get(0)?,
@@ -405,6 +409,20 @@ fn checksum(question: &str, answer: &str) -> String {
     hex::encode(hasher.finalize())
 }
 
+fn build_fts_query(query: &str) -> Option<String> {
+    let terms = query
+        .split(|ch: char| !ch.is_alphanumeric())
+        .filter(|term| !term.is_empty())
+        .map(|term| format!("\"{}\"", term.replace('"', "\"\"")))
+        .collect::<Vec<_>>();
+
+    if terms.is_empty() {
+        None
+    } else {
+        Some(terms.join(" "))
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -421,5 +439,22 @@ mod tests {
         db.delete_item(&id).unwrap();
         assert!(db.get_payload(&id).is_err());
         assert!(db.exact_search("Chi sei?").unwrap().is_none());
+    }
+
+    #[test]
+    fn fts_search_handles_accents_and_apostrophes() {
+        let db = SielDb::memory(b"test master secret").unwrap();
+        db.create_item(
+            "Che cos'è SIEL?",
+            "SIEL è un motore di conoscenza.",
+            "it",
+            None,
+            None,
+        )
+        .unwrap();
+
+        let results = db.fts_search("Che cos'è SIEL?", 8).unwrap();
+        assert_eq!(results.len(), 1);
+        assert_eq!(results[0].answer, "SIEL è un motore di conoscenza.");
     }
 }

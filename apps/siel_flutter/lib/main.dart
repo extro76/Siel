@@ -3,6 +3,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+const _apiBaseUrl = String.fromEnvironment(
+  'SIEL_API_BASE_URL',
+  defaultValue: 'http://127.0.0.1:8787',
+);
+
 void main() {
   runApp(const SielApp());
 }
@@ -44,15 +49,20 @@ class _QueryPageState extends State<QueryPage> {
     });
 
     try {
+      final requestBody = jsonEncode({'query': _controller.text, 'lang': 'it'});
       final response = await http.post(
-        Uri.parse('http://127.0.0.1:8787/query'),
-        headers: {'content-type': 'application/json'},
-        body: jsonEncode({'query': _controller.text, 'lang': 'it'}),
+        Uri.parse('$_apiBaseUrl/query'),
+        headers: {
+          'accept': 'application/json',
+          'content-type': 'application/json; charset=utf-8',
+        },
+        body: utf8.encode(requestBody),
       );
+      final responseBody = utf8.decode(response.bodyBytes);
       if (response.statusCode >= 400) {
-        throw Exception(response.body);
+        throw Exception(responseBody);
       }
-      setState(() => _response = jsonDecode(response.body));
+      setState(() => _response = jsonDecode(responseBody));
     } catch (error) {
       setState(() => _error = error.toString());
     } finally {
@@ -131,4 +141,3 @@ class _ResponsePanel extends StatelessWidget {
     );
   }
 }
-

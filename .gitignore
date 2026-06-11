@@ -6,10 +6,10 @@ target/
 .venv/
 __pycache__/
 *.pyc
+.gradle-home/
 models/weights/
 *.gguf
 *.onnx
 *.db
 *.db-shm
 *.db-wal
-
