@@ -13,3 +13,5 @@ models/weights/
 *.db
 *.db-shm
 *.db-wal
+db_Squad-it/
+testdata/import/
